@@ -28,7 +28,8 @@ def subscriber(clz):
                     fns.append(fn)
             def wnd_proc(*args):
                 for fn in fns:
-                    fn(self, *args)
+                    if fn(self, *args):
+                        break
                 else:
                     win32gui.DefWindowProc(*args)
             return wnd_proc
