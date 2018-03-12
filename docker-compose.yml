@@ -1,0 +1,15 @@
+version: '2.3'
+services:
+  container:
+    image: kamikat/wine-py
+    stdin_open: true
+    tty: true
+    command: bash
+    working_dir: $PWD
+    volumes:
+      - $PWD:$PWD
+      - $XSOCK:$XSOCK
+    environment:
+      - DISPLAY=$DISPLAY
+      - http_proxy=http://$LOCAL_IP:8123
+      - https_proxy=http://$LOCAL_IP:8123
