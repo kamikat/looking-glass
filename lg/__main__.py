@@ -14,12 +14,12 @@ from win32con import *
 from common.window import BaseWindow
 from common.message import subscriber, subscribe
 
-names = {}
+MESSAGE_NAME = {}
 
 for k in dir(win32con):
     v = win32con.__dict__.get(k)
-    if isinstance(v, int) and k[:2] == 'WM_':
-        names[v] = k
+    if isinstance(v, int) and k[:3] == 'WM_':
+        MESSAGE_NAME[v] = k
 
 class Application:
 
@@ -39,19 +39,16 @@ class OverlayWindow(BaseWindow):
 
     @subscribe
     def onmessage(self, hwnd, message, wparam, lparam):
-
-        print "[%d] message=0x%x wparam=0x%x lparam=0x%x" % (hwnd, message, wparam, lparam)
+        print "[%d] message=%s wparam=0x%x lparam=0x%x" % (hwnd, MESSAGE_NAME[message], wparam, lparam)
 
     @subscribe(WM_CREATE)
     def oncreate(self):
-        print "BOOM"
         print self.setWindowLong(GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TOPMOST)
         print self.setWindowPos(z=HWND_TOPMOST, x=100, y=100, flags=SWP_NOSIZE)
         self.show()
 
     @subscribe(WM_DESTROY)
     def ondestroy(self, hwnd, message, wparam, lparam):
-        print "WM_DESTROY"
         self.application.quit()
 
 if __name__ == '__main__':
