@@ -33,7 +33,7 @@ class BaseWindow(object):
                 self.className, title, style, x, y, w, h, 0, 0,
                 self.hInstance, None)
         for fn in self._wm_create_subscriptions:
-            fn(self, self.hwnd, win32con.WM_CREATE, 0, 0)
+            fn(self.hwnd, win32con.WM_CREATE, 0, 0)
         return self.hwnd
 
     def destroyWindow(self):
