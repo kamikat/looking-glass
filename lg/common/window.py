@@ -5,6 +5,7 @@ import win32con
 class BaseWindow(object):
 
     def __init__(self, hInstance=win32gui.dllhandle):
+        self._wm_create_subscriptions = [] # workaround WM_CREATE problem
         self.application = None
         self.hInstance = hInstance
         self.className = self.__class__.__name__
@@ -25,13 +26,18 @@ class BaseWindow(object):
 
     def createWindow(self,
             title='No Name',
-            style=win32con.WS_VISIBLE|win32con.WS_CAPTION|win32con.WS_SYSMENU,
+            style=win32con.WS_CAPTION|win32con.WS_SYSMENU,
             x=win32con.CW_USEDEFAULT, y=win32con.CW_USEDEFAULT,
             w=win32con.CW_USEDEFAULT, h=win32con.CW_USEDEFAULT):
         self.hwnd = win32gui.CreateWindow(
                 self.className, title, style, x, y, w, h, 0, 0,
                 self.hInstance, None)
+        for fn in self._wm_create_subscriptions:
+            fn(self, self.hwnd, win32con.WM_CREATE, 0, 0)
         return self.hwnd
+
+    def destroyWindow(self):
+        return win32gui.DestroyWindow(self.hwnd)
 
     def setWindowLong(self, index, value):
         return win32gui.SetWindowLong(self.hwnd, index, value)
@@ -43,7 +49,7 @@ class BaseWindow(object):
             z=0, x=0, y=0, w=0, h=0,
             flags=win32con.SWP_NOMOVE
                  |win32con.SWP_NOSIZE):
-        return win32gui.SetWindowPos(self.hwnd, z, x, y, cx, cy, )
+        return win32gui.SetWindowPos(self.hwnd, z, x, y, w, h, flags)
 
     def show(self, cmdShow = win32con.SW_SHOW):
         return win32gui.ShowWindow(self.hwnd, cmdShow)
