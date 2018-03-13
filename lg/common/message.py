@@ -3,20 +3,20 @@ import win32con
 import functools
 
 class _WrapperFn:
-    def __init__(self, message, fn):
+    def __init__(self, fn, *message):
         self.message = message
         self.fn = fn
-    def __call__(self, *args, **kwargs):
-        if (self.message == None or self.message == args[2]):
-            return self.fn(*args, **kwargs)
+    def __call__(self, *args):
+        if len(self.message) == 0 or (args[2] in self.message):
+            return self.fn(*args)
 
-def subscribe(message):
+def subscribe(*message):
     def wrapper(fn):
-        return _WrapperFn(message, fn)
-    if isinstance(message, int):
+        return _WrapperFn(fn, *message)
+    if isinstance(message[0], int):
         return wrapper
     else:
-        return _WrapperFn(None, message)
+        return _WrapperFn(message[0])
 
 def subscriber(clz):
     class WndMessageSubscriber(clz):
