@@ -3,7 +3,7 @@ import win32gui
 from win32con import *
 
 from win32gui import ShowWindow, SetWindowPos, GetWindowLong, SetWindowLong, SetLayeredWindowAttributes
-from win32gui import SendMessage, PostMessage, GetWindowRect, SetCapture, ReleaseCapture, GetCursorPos
+from win32gui import PostMessage, PostMessage, GetWindowRect, SetCapture, ReleaseCapture, GetCursorPos
 from win32api import GetAsyncKeyState
 
 from common.window import BaseWindow
@@ -47,7 +47,7 @@ class OverlayWindow(BaseWindow):
         if GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED:
             SetLayeredWindowAttributes(hwnd, 0, 255 * 90 / 100, LWA_ALPHA);
 
-    @subscribe(WM_NCHITTEST)
+    @subscribe(WM_NCHITTEST, WM_NCLBUTTONDOWN, WM_NCRBUTTONDOWN, WM_NCMBUTTONDOWN, WM_NCLBUTTONUP, WM_NCRBUTTONUP, WM_NCMBUTTONUP, WM_NCMOUSEMOVE)
     def on_hit(self, hwnd, message, wparam, lparam):
         x, y = (lparam & 0xFFFF, lparam >> 16)
         left, top, right, bottom = GetWindowRect(hwnd)
@@ -66,26 +66,25 @@ class OverlayWindow(BaseWindow):
         for mask, message in button_spec:
             p = self.check_button_state(modifier, mask)
             if p:
-                SendMessage(hwnd, message[p], modifier, a)
+                PostMessage(hwnd, message[p], modifier, a)
                 break
         else:
-            SendMessage(hwnd, WM_MOUSEMOVE, modifier, a)
+            PostMessage(hwnd, WM_MOUSEMOVE, modifier, a)
+        self._modifier = wparam
         print("[%d] Hit (%d, %d)" % (hwnd, x, y))
 
-    @subscribe(WM_LBUTTONDOWN, WM_NCLBUTTONDOWN, WM_RBUTTONDOWN, WM_NCRBUTTONDOWN, WM_MBUTTONDOWN, WM_NCMBUTTONDOWN)
+    @subscribe(WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_MBUTTONDOWN)
     def on_mousedown(self, hwnd, message, wparam, lparam):
-        self._modifier = wparam
         self._dx, self._dy = (lparam & 0xFFFF, lparam >> 16)
         if wparam & MK_LBUTTON:
             SetCapture(hwnd)
 
-    @subscribe(WM_LBUTTONUP, WM_NCLBUTTONUP, WM_RBUTTONUP, WM_NCRBUTTONUP, WM_MBUTTONUP, WM_NCMBUTTONUP)
+    @subscribe(WM_LBUTTONUP, WM_RBUTTONUP, WM_MBUTTONUP)
     def on_mouseup(self, hwnd, message, wparam, lparam):
-        self._modifier = wparam
         if wparam & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON) == 0:
             ReleaseCapture()
 
-    @subscribe(WM_MOUSEMOVE, WM_NCMOUSEMOVE)
+    @subscribe(WM_MOUSEMOVE)
     def on_mousemove(self, hwnd, message, wparam, lparam):
         if wparam & MK_LBUTTON:
             x0, y0 = GetCursorPos()
