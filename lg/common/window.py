@@ -32,8 +32,7 @@ class BaseWindow(object):
         self.hwnd = win32gui.CreateWindow(
                 self.className, title, style, x, y, w, h, 0, 0,
                 self.hInstance, None)
-        for fn in self._wm_create_subscriptions:
-            fn(self.hwnd, win32con.WM_CREATE, 0, 0)
+        win32gui.SendMessage(self.hwnd, win32con.WM_CREATE, 0, 0)
         return self.hwnd
 
     def destroyWindow(self):

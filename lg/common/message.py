@@ -29,8 +29,6 @@ def subscriber(clz):
                 if isinstance(fn, _WrapperFn):
                     bound_fn = functools.partial(fn, self)
                     self.subscriptions.append(bound_fn)
-                    if fn.message == win32con.WM_CREATE:
-                        self._wm_create_subscriptions.append(bound_fn)
             self.__bind_events = True
         def __getattribute__(self, name):
             v = clz.__getattribute__(self, name)
