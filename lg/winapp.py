@@ -30,7 +30,7 @@ class OverlayWindow(BaseWindow):
 
     @subscribe
     def on_message(self, hwnd, message, wparam, lparam):
-        print("[%d] message=%-24s wparam=0x%-10x lparam=0x%-10x" % (hwnd, get_message_name(message), wparam, lparam))
+        print("[%d] message=%-24s wparam=0x%08x lparam=0x%08x" % (hwnd, get_message_name(message), wparam, lparam))
 
     @subscribe(WM_CREATE)
     def on_create(self, hwnd, message, wparam, lparam):

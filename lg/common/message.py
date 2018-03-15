@@ -6,9 +6,9 @@ class _WrapperFn:
     def __init__(self, fn, *message):
         self.message = message
         self.fn = fn
-    def __call__(self, *args):
-        if len(self.message) == 0 or (args[2] in self.message):
-            return self.fn(*args)
+    def __call__(self, target, hwnd, message, wparam, lparam):
+        if len(self.message) == 0 or (message in self.message):
+            return self.fn(target, hwnd, message, wparam & 0xffffffff, lparam & 0xffffffff)
 
 def subscribe(*message):
     def wrapper(fn):
